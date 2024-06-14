@@ -1,7 +1,7 @@
 // models/User.js
 const mongoose = require('mongoose');
 
-const CreateUserSchema = new mongoose.Schema({
+const customerSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true
@@ -24,4 +24,4 @@ const CreateUserSchema = new mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model('CreateUser', CreateUserSchema);
+module.exports = mongoose.model('CustomerSchema', customerSchema, 'customers');
