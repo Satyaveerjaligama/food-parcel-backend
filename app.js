@@ -1,6 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const customerRoutes = require('./routes/customerRoutes');
+const hotelRoutes = require('./routes/hotelRoutes');
+const deliveryAgentRoutes = require('./routes/deliveryAgentRoutes');
 
 const app = express();
 const port = 5000;
@@ -15,6 +17,8 @@ mongoose.connect(mongoURI)
   .catch(err => console.log(err));
 
 app.use("/customer", customerRoutes);
+app.use("/hotel", hotelRoutes);
+app.use("/delivery-agent", deliveryAgentRoutes);
 
 // Start the server
 app.listen(port, () => {
