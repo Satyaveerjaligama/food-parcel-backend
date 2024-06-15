@@ -13,7 +13,7 @@ const hotelSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    email: {
+    emailId: {
         type: String,
         required: true
     },

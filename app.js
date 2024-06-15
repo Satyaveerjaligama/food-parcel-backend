@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const mongoose = require('mongoose');
 const customerRoutes = require('./routes/customerRoutes');
 const hotelRoutes = require('./routes/hotelRoutes');
@@ -6,6 +7,11 @@ const deliveryAgentRoutes = require('./routes/deliveryAgentRoutes');
 
 const app = express();
 const port = 5000;
+const corsOptions = {
+  origin: 'http://localhost:3000',
+};
+
+app.use(cors(corsOptions));
 
 // Middleware to parse JSON
 app.use(express.json());

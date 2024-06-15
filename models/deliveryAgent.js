@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
 
 const deliveryAgentSchema = new mongoose.Schema({
-    name: {
+    fullName: {
         type: String,
         required: true
     },
-    email: {
+    emailId: {
         type: String,
         required: true
     },
