@@ -3,6 +3,6 @@ const router = express.Router();
 const hotelControllers = require("../controllers/hotelController");
 
 router.post("/register", hotelControllers.register);
-router.get("/login", hotelControllers.login);
+router.post("/login", hotelControllers.login);
 
 module.exports = router;
