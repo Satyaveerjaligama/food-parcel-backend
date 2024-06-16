@@ -1,11 +1,28 @@
-const DeliveryAgent = require("../models/deliveryAgent");
+const { DeliveryAgent } = require("../models/deliveryAgent");
 
 exports.register = async (req, res) => {
-    try {
-        const newDeliveryAgent = new DeliveryAgent(req.body);
-        await newDeliveryAgent.save();
-        res.status(201).send("Delivery agent registration successful");
-    } catch(err) {
-        res.status(404).send(err.message);
-    }
-}
+  try {
+    const newDeliveryAgent = new DeliveryAgent(req.body);
+    await newDeliveryAgent.save();
+    res.status(201).send("Delivery agent registration successful");
+  } catch (err) {
+    res.status(404).send(err.message);
+  }
+};
+
+exports.login = async (req, res) => {
+  DeliveryAgent.find({
+    emailId: req.body.emailId,
+    password: req.body.password,
+  })
+    .then((doc) => {
+      if (doc.length === 0) {
+        res.status(400).json({ message: "Match not found" });
+      } else {
+        res.status(200).json(doc);
+      }
+    })
+    .catch((err) => {
+      res.status(400).json({ message: err.message });
+    });
+};
