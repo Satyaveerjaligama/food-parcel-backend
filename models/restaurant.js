@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
-const hotelSchema = new mongoose.Schema({
-    hotelName: {
+const restaurantSchema = new mongoose.Schema({
+    restaurantName: {
         type: String,
         required: true
     },
@@ -35,8 +35,8 @@ const hotelSchema = new mongoose.Schema({
     },
 })
 
-const Hotel = mongoose.model('Hotel', hotelSchema, 'hotels');
+const Restaurant = mongoose.model('Restaurant', restaurantSchema, 'restaurants');
 
 module.exports = {
-    Hotel: Hotel
+    Restaurant: Restaurant
 }
