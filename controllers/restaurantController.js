@@ -1,4 +1,4 @@
-const {Restaurant} = require('../models/hotel');
+const {Restaurant} = require('../models/restaurant');
 const {RESPONSE_MESSAGES} = require("../utilities/constants");
 
 exports.register = async (req, res) => {

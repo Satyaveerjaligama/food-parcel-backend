@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const customerRoutes = require('./routes/customerRoutes');
-const restaurantRoutes = require('./routes/hotelRoutes');
+const restaurantRoutes = require('./routes/restaurantRoutes');
 const deliveryAgentRoutes = require('./routes/deliveryAgentRoutes');
 
 const app = express();
