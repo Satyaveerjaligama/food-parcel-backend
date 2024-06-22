@@ -1,18 +1,18 @@
-const {Hotel} = require('../models/hotel');
+const {Restaurant} = require('../models/hotel');
 const {RESPONSE_MESSAGES} = require("../utilities/constants");
 
 exports.register = async (req, res) => {
     try{
-        const newHotel = new Hotel(req.body);
-        await newHotel.save()
-        res.status(201).send(`Hotel ${RESPONSE_MESSAGES.registrationSuccess}`)
+        const newRestaurant = new Restaurant(req.body);
+        await newRestaurant.save()
+        res.status(201).send(`Restaurant ${RESPONSE_MESSAGES.registrationSuccess}`)
     } catch(err) {
         res.status(404).send(err.message);
     }
 }
 
 exports.login = async (req,res) => {
-    Hotel.find({
+    Restaurant.find({
         emailId: req.body.emailId,
         password: req.body.password,
     }).then((doc)=>{
