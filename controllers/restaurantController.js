@@ -1,9 +1,18 @@
 const {Restaurant} = require('../models/restaurant');
 const {RESPONSE_MESSAGES} = require("../utilities/constants");
+const {generateUserId} = require("../utilities/utilityFunctions");
 
 exports.register = async (req, res) => {
     try{
-        const newRestaurant = new Restaurant(req.body);
+        let userId = generateUserId('restaurant');
+        let restaurant = await Restaurant.findOne({ userId });
+
+        while(restaurant) {
+            userId = generateUserId('restaurant');
+            restaurant = await Restaurant.findOne({ userId });
+        }
+
+        const newRestaurant = new Restaurant({...req.body, restaurantId: userId});
         await newRestaurant.save()
         res.status(201).send(`Restaurant ${RESPONSE_MESSAGES.registrationSuccess}`)
     } catch(err) {
@@ -18,6 +27,8 @@ exports.login = async (req,res) => {
     }).then((doc)=>{
         if(doc.length === 0) {
             res.status(400).json({message: RESPONSE_MESSAGES.detailsNotFound})
+        } else if (!doc[0].isActive) { 
+            res.status(400).json({message: RESPONSE_MESSAGES.userIsInactive})
         } else {
             res.status(200).json(doc);
         }
