@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const customerRoutes = require('./routes/customerRoutes');
-const hotelRoutes = require('./routes/hotelRoutes');
+const restaurantRoutes = require('./routes/restaurantRoutes');
 const deliveryAgentRoutes = require('./routes/deliveryAgentRoutes');
 
 const app = express();
@@ -23,7 +23,7 @@ mongoose.connect(mongoURI)
   .catch(err => console.log(err));
 
 app.use("/customer", customerRoutes);
-app.use("/hotel", hotelRoutes);
+app.use("/restaurant", restaurantRoutes);
 app.use("/delivery-agent", deliveryAgentRoutes);
 
 // Start the server
