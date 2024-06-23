@@ -1,6 +1,12 @@
 const mongoose = require("mongoose");
 
 const restaurantSchema = new mongoose.Schema({
+    restaurantId: {
+        type: String,
+        required :true,
+        unique: true,
+        immutable: true
+    },
     restaurantName: {
         type: String,
         required: true,
