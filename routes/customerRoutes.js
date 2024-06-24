@@ -5,5 +5,6 @@ const customerController = require("../controllers/customerController");
 router.post("/register", customerController.register);
 router.post("/login", customerController.login);
 router.get("/fetchRestaurants/:pincode", customerController.fetchRestaurants);
+router.get("/fetchRestaurantDetails/:restaurantId", customerController.fetchRestaurantDetails);
 
 module.exports = router;

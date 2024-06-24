@@ -44,3 +44,14 @@ exports.fetchRestaurants = async(req, res) => {
         res.status(400).json({message: err.message})
     }
 };
+
+// This api will fetch the restaurant details based on the restaurant id
+exports.fetchRestaurantDetails = async(req, res) => {
+    const restaurantId = req.params?.restaurantId;
+    try {
+        const restaurants = await Restaurant.find({restaurantId},{restaurantId: 1, restaurantName: 1, restaurantType: 1, _id: 0});
+        res.status(200).json(restaurants[0]);
+    } catch(err) {
+        res.status(400).json({message: err.message})
+    }
+}
