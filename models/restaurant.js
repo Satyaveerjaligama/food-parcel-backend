@@ -58,6 +58,10 @@ const restaurantSchema = new mongoose.Schema({
     isActive: {
         type: Boolean,
         default: true,
+    },
+    restaurantImage: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'uploads.files'
     }
 })
 
