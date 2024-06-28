@@ -4,6 +4,9 @@ const RESPONSE_MESSAGES = {
     userIsInactive: 'Sorry, User is inactive'
 }
 
+const MONGO_URI = 'mongodb://127.0.0.1:27017/food_delivery_app';
+
 module.exports={
     RESPONSE_MESSAGES,
+    MONGO_URI
 }
