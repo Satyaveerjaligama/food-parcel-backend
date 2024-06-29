@@ -3,6 +3,7 @@ const cors = require('cors');
 const customerRoutes = require('./routes/customerRoutes');
 const restaurantRoutes = require('./routes/restaurantRoutes');
 const deliveryAgentRoutes = require('./routes/deliveryAgentRoutes');
+const commonRoutes = require('./routes/commonRoutes');
 const {connectDB} = require('./config/db');
 
 const app = express();
@@ -21,6 +22,7 @@ connectDB();
 app.use("/customer", customerRoutes);
 app.use("/restaurant", restaurantRoutes);
 app.use("/delivery-agent", deliveryAgentRoutes);
+app.use("/", commonRoutes);
 
 // Start the server
 app.listen(port, () => {

@@ -1,7 +1,6 @@
 const {Restaurant} = require('../models/restaurant');
 const {RESPONSE_MESSAGES} = require("../utilities/constants");
 const {generateUserId} = require("../utilities/utilityFunctions");
-const mongoose = require('mongoose');
 
 exports.register = async (req, res) => {
     try{
@@ -59,40 +58,3 @@ exports.fetchRestaurantDetails = async(req, res) => {
         res.status(400).json({message: err.message})
     }
 }
-
-exports.uploadFile = async (req, res) => {
-  try {
-    const restaurant = await Restaurant.findOne({
-      restaurantId: req.params.restaurantId,
-    });
-    if (!restaurant) {
-      return res.status(404).json({ msg: "Restaurant not found" });
-    }
-
-    const gfs = req.gfs;
-    if (!gfs) {
-      return res.status(500).json({ error: 'gfs is not defined' });
-    }
-
-    // If there is already an image, delete the old image file from GridFS
-    if (restaurant.restaurantImage) {
-      await gfs.delete(
-        new mongoose.Types.ObjectId(restaurant.restaurantImage),
-        (err) => {
-          if (err) {
-            return res
-              .status(500)
-              .json({ msg: "Error occurred while deleting old image" });
-          }
-        }
-      );
-    }
-
-    restaurant.restaurantImage = req.file.id;
-    await restaurant.save();
-
-    res.json({ file: req.file, restaurant });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
