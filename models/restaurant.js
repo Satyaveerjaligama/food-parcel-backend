@@ -59,7 +59,7 @@ const restaurantSchema = new mongoose.Schema({
         type: Boolean,
         default: true,
     },
-    restaurantImage: {
+    image: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'uploads.files'
     }

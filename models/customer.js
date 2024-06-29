@@ -44,6 +44,10 @@ const customerSchema = new mongoose.Schema({
     required: true,
     default: true
   },
+  image: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'uploads.files'
+  }
 });
 
 const Customer = mongoose.model('CustomerRegistration', customerSchema, 'customers');

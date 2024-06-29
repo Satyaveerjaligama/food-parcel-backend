@@ -55,6 +55,10 @@ const deliveryAgentSchema = new mongoose.Schema({
     required: true,
     default: true
   },
+  image: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'uploads.files'
+  }
 });
 
 const DeliveryAgent = mongoose.model(
