@@ -19,16 +19,3 @@ exports.register = async (req, res) => {
         res.status(400).send(err.message)
     }
 }
-
-exports.login = async(req, res) => {
-    Customer.find({
-        emailId: req.body.emailId,
-        password: req.body.password
-    }).then((doc)=>{
-        if(doc.length === 0) res.status(400).json({message: RESPONSE_MESSAGES.detailsNotFound})
-        else if (!doc[0].isActive) res.status(400).json({message: RESPONSE_MESSAGES.userIsInactive})
-        else res.status(200).json(doc)
-    }).catch((err) => {
-        res.status(400).json({message: err.message})
-    })
-}

@@ -21,25 +21,6 @@ exports.register = async (req, res) => {
   }
 };
 
-exports.login = async (req, res) => {
-  Restaurant.find({
-    emailId: req.body.emailId,
-    password: req.body.password,
-  })
-    .then((doc) => {
-      if (doc.length === 0) {
-        res.status(400).json({ message: RESPONSE_MESSAGES.detailsNotFound });
-      } else if (!doc[0].isActive) {
-        res.status(400).json({ message: RESPONSE_MESSAGES.userIsInactive });
-      } else {
-        res.status(200).json(doc);
-      }
-    })
-    .catch((err) => {
-      res.status(400).json({ message: err.message });
-    });
-};
-
 // This API will fetch all restaurants based on the pincode that we provide
 exports.fetchRestaurants = async (req, res) => {
   const pincode = req.params?.pincode;
