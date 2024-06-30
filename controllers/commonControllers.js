@@ -1,8 +1,68 @@
+const mongoose = require("mongoose");
 const { Restaurant } = require("../models/restaurant");
 const { Customer } = require("../models/customer");
 const { DeliveryAgent } = require("../models/deliveryAgent");
-const mongoose = require("mongoose");
+const { MenuItem } = require('../models/menuItem');
 const { USER_TYPES } = require("../utilities/constants");
+const {RESPONSE_MESSAGES} = require("../utilities/constants");
+
+exports.login = async (req, res) => {
+  let Model;
+  // model will be set based on the userType
+  switch (req.body.userType) {
+    case USER_TYPES.customer:
+      Model = Customer;
+      break;
+    case USER_TYPES.restaurant:
+      Model = Restaurant;
+      break;
+    case USER_TYPES.deliveryAgent:
+      Model = DeliveryAgent;
+      break;
+  }
+
+  Model.find({
+    emailId: req.body.emailId,
+    password: req.body.password,
+  })
+    .then((documents) => {
+      if (documents.length === 0) {
+        res.status(404).json({ message: RESPONSE_MESSAGES.detailsNotFound });
+      } else if (!documents[0].isActive) {
+        res.status(403).json({ message: RESPONSE_MESSAGES.userIsInactive });
+      } else {
+        let responseObj;
+        // response obj will be set based on the userType
+        switch (req.body.userType) {
+          case USER_TYPES.customer:
+            responseObj = {
+              name: documents[0].fullName,
+              userId: documents[0].customerId,
+              pincode: documents[0].pincode,
+            };
+            break;
+          case USER_TYPES.restaurant:
+            responseObj = {
+              name: documents[0].restaurantName,
+              userId: documents[0].restaurantId,
+              pincode: documents[0].pincode,
+            };
+            break;
+          case USER_TYPES.deliveryAgent:
+            responseObj = {
+              name: documents[0].fullName,
+              userId: documents[0].deliveryAgentId,
+              pincode: documents[0].availabilityPincode,
+            };
+            break;
+        }
+        res.status(200).json(responseObj);
+      }
+    })
+    .catch((err) => {
+      res.status(400).json({ message: err.message });
+    });
+};
 
 exports.fileUpload = async (req, res) => {
   try {
@@ -20,6 +80,10 @@ exports.fileUpload = async (req, res) => {
       case USER_TYPES.deliveryAgent:
         model = DeliveryAgent;
         key = USER_TYPES.deliveryAgent+'Id';
+        break;
+      case 'menuItem':
+        model = MenuItem;
+        key = "itemId";
         break;
     }
 
