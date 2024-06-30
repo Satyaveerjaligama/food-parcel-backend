@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const { Restaurant } = require("../models/restaurant");
 const { Customer } = require("../models/customer");
 const { DeliveryAgent } = require("../models/deliveryAgent");
+const { MenuItem } = require('../models/menuItem');
 const { USER_TYPES } = require("../utilities/constants");
 const {RESPONSE_MESSAGES} = require("../utilities/constants");
 
@@ -79,6 +80,10 @@ exports.fileUpload = async (req, res) => {
       case USER_TYPES.deliveryAgent:
         model = DeliveryAgent;
         key = USER_TYPES.deliveryAgent+'Id';
+        break;
+      case 'menuItem':
+        model = MenuItem;
+        key = "itemId";
         break;
     }
 

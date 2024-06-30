@@ -2,6 +2,7 @@ const { Restaurant } = require("../models/restaurant");
 const { RESPONSE_MESSAGES } = require("../utilities/constants");
 const { generateUserId } = require("../utilities/utilityFunctions");
 const { Types } = require("mongoose");
+const { MenuItem } = require("../models/menuItem");
 
 exports.register = async (req, res) => {
   try {
@@ -97,3 +98,35 @@ exports.fetchRestaurantDetails = async(req, res) => {
         res.status(400).json({message: err.message})
     }
 }
+
+// This api will add a menu item
+exports.addMenuItem = async(req,res) => {
+  try{
+    // check the restaurant before adding the menu item
+    let restaurant = await Restaurant.findOne({restaurantId: req.body.restaurantId});
+    console.log('restaurant', restaurant);
+    if(!restaurant) {
+      res.status(404).json({message: 'Unable to find the restaurant to add the menu item'});
+      return;
+    }
+
+    // generate a unique item id
+    let itemId = generateUserId('menuItem');
+    let existingMenuItem = await MenuItem.findOne({itemId});
+
+    while(existingMenuItem) {
+      itemId = generateUserId('menuItem');
+      existingMenuItem = await MenuItem.findOne({itemId});
+    }
+
+    // create and save document in the table
+    const menuItem = new MenuItem({...req.body, itemId})
+    await menuItem.save();
+    res.status(201).json({
+      itemId,
+      name: menuItem.name
+    });
+  } catch(err) {
+    res.status(400).send(err.message);
+  }
+};
