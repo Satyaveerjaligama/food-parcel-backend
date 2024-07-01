@@ -38,7 +38,7 @@ const menuItemSchema = new mongoose.Schema({
         required: true,
     },
     mainIngredients: {
-        type: Array,
+        type: String,
         required: true,
     },
     rating: {

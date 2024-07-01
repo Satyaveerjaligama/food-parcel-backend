@@ -9,5 +9,7 @@ router.post("/register", restaurantControllers.register);
 router.get("/fetchRestaurants/:pincode", attachGFS, restaurantControllers.fetchRestaurants);
 router.get("/fetchRestaurantDetails/:restaurantId", restaurantControllers.fetchRestaurantDetails);
 router.post("/add-menu-item", validateSchema(addMenuItem), restaurantControllers.addMenuItem);
+router.get("/get-menu-items/:restaurantId", restaurantControllers.getMenuItems);
+router.patch("/update-menu-item/:itemId", validateSchema(addMenuItem), restaurantControllers.updateMenuItem);
 
 module.exports = router;

@@ -129,3 +129,53 @@ exports.addMenuItem = async(req,res) => {
     res.status(400).send(err.message);
   }
 };
+
+// This api will fetch all the menu items based on the restaurant id that is passed in api route
+exports.getMenuItems = async(req, res) => {
+  try {
+    const restaurantId = req.params.restaurantId;
+    const menuItems = await MenuItem.find({restaurantId}, {_id: 0, __v: 0})
+    
+    // if menu items are not available
+    if(menuItems.length === 0) {
+      res.status(404).json({message: 'Menu items not found'});
+      return;
+    }
+
+    res.status(200).json(menuItems)
+  } catch(err) {
+    res.status(400).json({message: "Something went wrong"})
+  }
+};
+
+// This API will update the data of a menu item
+exports.updateMenuItem = async(req,res) => {
+  try{
+    const itemId = req.params.itemId;
+    const reqBody = req.body;
+    const updatedMenuItem = await MenuItem.updateOne(
+      {
+        itemId: itemId,
+      },
+      { $set:
+        {
+          name: reqBody.name,
+          price: reqBody.price,
+          isVeg: reqBody.isVeg,
+          isAvailable: reqBody.isAvailable,
+          type: reqBody.type,
+          category: reqBody.category,
+          mainIngredients: reqBody.mainIngredients,
+        }
+      }
+    )
+    
+    if(updatedMenuItem.matchedCount >0) {
+      res.status(200).json({message: 'Menu item updated successfully'})
+    } else {
+      res.status(404).json({message: 'Menu item not found'})
+    }
+  } catch(err) {
+    res.status(400).json({message: "Something went wrong"})
+  }
+};
