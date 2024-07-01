@@ -104,7 +104,6 @@ exports.addMenuItem = async(req,res) => {
   try{
     // check the restaurant before adding the menu item
     let restaurant = await Restaurant.findOne({restaurantId: req.body.restaurantId});
-    console.log('restaurant', restaurant);
     if(!restaurant) {
       res.status(404).json({message: 'Unable to find the restaurant to add the menu item'});
       return;
