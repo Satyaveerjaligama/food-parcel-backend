@@ -103,7 +103,8 @@ exports.fetchRestaurantDetails = async(req, res) => {
 exports.addMenuItem = async(req,res) => {
   try{
     // check the restaurant before adding the menu item
-    let restaurant = await Restaurant.findOne({restaurantId: req.body.restaurantId});
+    const restaurantId = req.body.restaurantId;
+    let restaurant = await Restaurant.findOne({restaurantId});
     if(!restaurant) {
       res.status(404).json({message: 'Unable to find the restaurant to add the menu item'});
       return;
@@ -121,11 +122,74 @@ exports.addMenuItem = async(req,res) => {
     // create and save document in the table
     const menuItem = new MenuItem({...req.body, itemId})
     await menuItem.save();
-    res.status(201).json({
+
+    const addedItem = {
       itemId,
       name: menuItem.name
+    };
+
+    // fetching updated menu items list
+    const allMenuItems = await MenuItem.find({restaurantId}, {_id: 0, __v: 0});
+
+    res.status(201).json({
+      addedItem,
+      allMenuItems
     });
   } catch(err) {
     res.status(400).send(err.message);
+  }
+};
+
+// This api will fetch all the menu items based on the restaurant id that is passed in api route
+exports.getMenuItems = async(req, res) => {
+  try {
+    const restaurantId = req.params.restaurantId;
+    const menuItems = await MenuItem.find({restaurantId}, {_id: 0, __v: 0})
+    
+    // if menu items are not available
+    if(menuItems.length === 0) {
+      res.status(404).json({message: 'Menu items not found'});
+      return;
+    }
+
+    res.status(200).json(menuItems)
+  } catch(err) {
+    res.status(400).json({message: "Something went wrong"})
+  }
+};
+
+// This API will update the data of a menu item
+exports.updateMenuItem = async(req,res) => {
+  try{
+    const itemId = req.params.itemId;
+    const reqBody = req.body;
+    const restaurantId = reqBody.restaurantId;
+    const updatedMenuItem = await MenuItem.updateOne(
+      {
+        itemId,
+        restaurantId
+      },
+      { $set:
+        {
+          name: reqBody.name,
+          price: reqBody.price,
+          isVeg: reqBody.isVeg,
+          isAvailable: reqBody.isAvailable,
+          type: reqBody.type,
+          category: reqBody.category,
+          mainIngredients: reqBody.mainIngredients,
+        }
+      }
+    )
+    
+    if(updatedMenuItem.matchedCount > 0) {
+      const menuItems = await MenuItem.find({restaurantId}, {_id: 0, __v: 0})
+
+      res.status(200).json(menuItems)
+    } else {
+      res.status(404).json({message: 'Menu item not found'})
+    }
+  } catch(err) {
+    res.status(400).json({message: "Something went wrong"})
   }
 };
