@@ -166,3 +166,54 @@ exports.getImageById = async (req, res) => {
     res.status(500).json({ error: 'Server Error' });
   }
 };
+
+// this api will set the isActive value to false
+exports.delete = async(req, res) => {
+  try{
+    let Model;
+    let key;
+    // setting the model
+    switch (req.params.type) {
+      case USER_TYPES.customer:
+        Model = Customer;
+        key = USER_TYPES.customer+'Id';
+        break;
+      case USER_TYPES.restaurant:
+        Model = Restaurant;
+        key = USER_TYPES.restaurant+'Id';
+        break;
+      case USER_TYPES.deliveryAgent:
+        Model = DeliveryAgent;
+        key = USER_TYPES.deliveryAgent+'Id';
+        break;
+      case 'menuItem':
+        Model = MenuItem;
+        key = "itemId";
+        break;
+    }
+
+    const document = await Model.updateOne(
+      {
+        [key]: req.params.id,
+      },
+      {
+        $set: {
+          isActive: false,
+        },
+      }
+    );
+
+    if(document.modifiedCount === 0 && document.matchedCount === 1) {
+      res.status(400).json({message: 'Already in-active'});
+      return;
+    } else if(document.matchedCount !== 1) {
+      res.status(404).json({message: 'Details not found'});
+      return;
+    }
+
+    res.status(200).json({message: 'Deleted successfully'});
+  } catch(err) {
+    console.log(err);
+    res.status(400).json({message: "Something went wrong"});
+  }
+};

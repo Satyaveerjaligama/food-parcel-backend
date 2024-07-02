@@ -39,29 +39,6 @@ exports.fetchRestaurants = async (req, res) => {
       }
     );
 
-    // Fetch the image using imageId and convert to base 64
-    const downloadImage = (gfs, imageId) => {
-      return new Promise((resolve, reject) => {
-        let chunks = [];
-        const downloadStream = gfs.openDownloadStream(imageId);
-
-        downloadStream.on("data", (chunk) => {
-          chunks.push(chunk);
-        });
-
-        // if image is not present or any other error
-        downloadStream.on("error", (err) => {
-          resolve("");
-        });
-
-        // concating and converting to base 64
-        downloadStream.on("end", () => {
-          const binaryData = Buffer.concat(chunks);
-          resolve(binaryData.toString("base64"));
-        });
-      });
-    };
-
     const promises = restaurants.map(async (restaurant) => {
       let base64Image;
       // if a restaurant has an image, then we try to get and convert to base 64 using downloadImage function
