@@ -193,3 +193,26 @@ exports.updateMenuItem = async(req,res) => {
     res.status(400).json({message: "Something went wrong"})
   }
 };
+
+// This api will delete the menu item based on item id and restaurant id
+exports.deleteMenuItem = async(req,res) => {
+  try {
+    const restaurantId = req.body.restaurantId;
+    const result = await MenuItem.deleteOne(
+      {
+        itemId: req.body.itemId,
+        restaurantId
+      }
+    )
+
+    if(result.deletedCount > 0) {
+      // Fetching update menu items list
+      const allMenuItems = await MenuItem.find({restaurantId}, {_id: 0, __v: 0});
+      res.status(200).json(allMenuItems);
+    } else {
+      res.status(404).json({message: "Menu Item not found"});
+    }
+  } catch(err) {
+    res.status(400).json({message: "Something went wrong"});
+  }
+};
