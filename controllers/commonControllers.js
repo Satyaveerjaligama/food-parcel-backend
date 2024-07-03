@@ -56,7 +56,11 @@ exports.login = async (req, res) => {
             };
             break;
         }
-        res.status(200).json(responseObj);
+        res.status(200).json({
+          ...responseObj,
+          phoneNumber: documents[0].phoneNumber,
+          emailId: documents[0].emailId,
+        });
       }
     })
     .catch((err) => {
@@ -258,6 +262,60 @@ exports.changePassword = async(req,res) => {
     }
 
     res.status(200).json({message: 'Updated successfully'});
+  } catch(err) {
+    res.status(400).json(err.message);
+  }
+};
+
+// This api can be used to update the account details of the user
+exports.updateAccountDetails = async(req,res) => {
+  try{
+    let Model;
+    let key;
+    const data = {};
+    // setting the Model and key
+    switch (req.body.type) {
+      case USER_TYPES.customer:
+        Model = Customer;
+        key = USER_TYPES.customer+'Id';
+        data.fullName = req.body.name;
+        data.pincode = req.body.pincode;
+        break;
+      case USER_TYPES.restaurant:
+        Model = Restaurant;
+        key = USER_TYPES.restaurant+'Id';
+        data.restaurantName = req.body.name;
+        data.pincode = req.body.pincode;
+        break;
+      case USER_TYPES.deliveryAgent:
+        Model = DeliveryAgent;
+        key = USER_TYPES.deliveryAgent+'Id';
+        data.fullName = req.body.name;
+        data.availabilityPincode = req.body.pincode;
+        break;
+    }
+
+    // trying to update the details
+    const document = await Model.updateOne({
+      [key]: req.body.userId
+    }, {
+      $set: {
+        ...data,
+        emailId: req.body.emailId,
+        phoneNumber: req.body.phoneNumber
+      }
+    })
+
+    if(document.modifiedCount === 0 && document.matchedCount === 1) {
+      res.status(400).json({message: 'Existing data is same'});
+      return;
+    } else if(document.matchedCount !== 1) {
+      res.status(404).json({message: 'Details not found'});
+      return;
+    }
+
+    res.status(200).json({message: 'Updated successfully'});
+
   } catch(err) {
     res.status(400).json(err.message);
   }
