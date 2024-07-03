@@ -1,6 +1,6 @@
 const { Restaurant } = require("../models/restaurant");
 const { RESPONSE_MESSAGES } = require("../utilities/constants");
-const { generateUserId } = require("../utilities/utilityFunctions");
+const { generateUserId, downloadImage } = require("../utilities/utilityFunctions");
 const { Types } = require("mongoose");
 const { MenuItem } = require("../models/menuItem");
 
@@ -38,29 +38,6 @@ exports.fetchRestaurants = async (req, res) => {
         _id: 0,
       }
     );
-
-    // Fetch the image using imageId and convert to base 64
-    const downloadImage = (gfs, imageId) => {
-      return new Promise((resolve, reject) => {
-        let chunks = [];
-        const downloadStream = gfs.openDownloadStream(imageId);
-
-        downloadStream.on("data", (chunk) => {
-          chunks.push(chunk);
-        });
-
-        // if image is not present or any other error
-        downloadStream.on("error", (err) => {
-          resolve("");
-        });
-
-        // concating and converting to base 64
-        downloadStream.on("end", () => {
-          const binaryData = Buffer.concat(chunks);
-          resolve(binaryData.toString("base64"));
-        });
-      });
-    };
 
     const promises = restaurants.map(async (restaurant) => {
       let base64Image;
@@ -152,7 +129,35 @@ exports.getMenuItems = async(req, res) => {
       return;
     }
 
-    res.status(200).json(menuItems)
+    const response = [];
+
+    const promises = menuItems.map(async (menuItem) => {
+      let base64Image;
+      // if a menu item has an image, then we try to get and convert to base 64 using downloadImage function
+      if (menuItem.image) {
+        const imageId = new Types.ObjectId(menuItem.image);
+        const gfs = req.gfs;
+        base64Image = await downloadImage(gfs, imageId);
+      }
+
+      response.push({
+        itemId: menuItem.itemId,
+        name: menuItem.name,
+        price: menuItem.price,
+        restaurantId: menuItem.restaurantId,
+        isVeg: menuItem.isVeg,
+        isAvailable: menuItem.isAvailable,
+        type: menuItem.type,
+        category: menuItem.category,
+        mainIngredients: menuItem.mainIngredients,
+        rating: menuItem.rating,
+        image: base64Image ? base64Image : "",
+      });
+    });
+
+    await Promise.all(promises);
+    
+    res.status(200).json(response);
   } catch(err) {
     res.status(400).json({message: "Something went wrong"})
   }
