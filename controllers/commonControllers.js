@@ -60,6 +60,7 @@ exports.login = async (req, res) => {
           ...responseObj,
           phoneNumber: documents[0].phoneNumber,
           emailId: documents[0].emailId,
+          address: documents[0].address,
         });
       }
     })

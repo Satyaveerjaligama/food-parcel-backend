@@ -4,6 +4,7 @@ const customerRoutes = require('./routes/customerRoutes');
 const restaurantRoutes = require('./routes/restaurantRoutes');
 const deliveryAgentRoutes = require('./routes/deliveryAgentRoutes');
 const commonRoutes = require('./routes/commonRoutes');
+const orderRouter = require('./routes/orderRoutes');
 const {connectDB} = require('./config/db');
 
 const app = express();
@@ -22,6 +23,7 @@ connectDB();
 app.use("/customer", customerRoutes);
 app.use("/restaurant", restaurantRoutes);
 app.use("/delivery-agent", deliveryAgentRoutes);
+app.use("/order", orderRouter);
 app.use("/", commonRoutes);
 
 // Start the server
