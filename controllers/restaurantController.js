@@ -1,8 +1,9 @@
 const { Restaurant } = require("../models/restaurant");
-const { RESPONSE_MESSAGES } = require("../utilities/constants");
+const { RESPONSE_MESSAGES, ORDER_STATUS } = require("../utilities/constants");
 const { generateUserId, downloadImage } = require("../utilities/utilityFunctions");
 const { Types } = require("mongoose");
 const { MenuItem } = require("../models/menuItem");
+const { Orders } = require('../models/orders');
 
 exports.register = async (req, res) => {
   try {
@@ -219,5 +220,25 @@ exports.deleteMenuItem = async(req,res) => {
     }
   } catch(err) {
     res.status(400).json({message: "Something went wrong"});
+  }
+};
+
+exports.fetchActiveOrders = async(req,res) => {
+  try {
+    const activeOrders = await Orders.find({
+      restaurantId: req.params.restaurantId,
+      orderStatus: {$in: [ORDER_STATUS.processing, ORDER_STATUS.accepted]}
+    }, {
+      orderStatus: 1,
+      foodItems: 1,
+      orderId: 1,
+      paymentMode: 1,
+      totalPrice: 1,
+      _id: 0,
+    })
+
+    res.status(200).json(activeOrders);
+  } catch(err) {
+    res.status(400).json({message: "something went wrong"});
   }
 };
