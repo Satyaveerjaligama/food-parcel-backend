@@ -35,3 +35,31 @@ exports.create = async(req, res) => {
         res.status(400).json({message: "Something went wrong"})
     }
 };
+
+exports.updateStatus = async(req, res) => {
+    try{
+        const document = await Orders.updateOne(
+            {
+                orderId: req.body.orderId
+            },
+            {
+                $set: {
+                    [req.body.statusType]: req.body.status,
+                }
+            }
+        );
+
+        if(document.matchedCount === 1 && document.modifiedCount === 0) {
+            res.status(400).json({message: 'Status is already up-to-date'})
+            return;
+        } else if (document.matchedCount === 0) {
+            res.status(400).json({message: 'Order not found'});
+            return;
+        }
+        
+        res.status(200).json({message: 'Status updated successfully'})
+    } catch(err) {
+        console.log(err);
+        res.status(400).json({message: 'Something went wrong'})
+    }
+};
