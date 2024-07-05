@@ -54,6 +54,10 @@ const ordersSchema = new mongoose.Schema({
     time: {
         type: String,
         required: true
+    },
+    pincode: {
+        type: String,
+        required: true
     }
 })
 
