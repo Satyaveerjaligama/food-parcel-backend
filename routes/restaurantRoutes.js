@@ -12,5 +12,6 @@ router.get("/get-menu-items/:restaurantId", attachGFS, restaurantControllers.get
 router.post("/menu-item", validateSchema(addMenuItem), restaurantControllers.addMenuItem);
 router.patch("/menu-item/:itemId", validateSchema(addMenuItem), restaurantControllers.updateMenuItem);
 router.delete("/menu-item", restaurantControllers.deleteMenuItem);
+router.get('/active-orders/:restaurantId', restaurantControllers.fetchActiveOrders)
 
 module.exports = router;

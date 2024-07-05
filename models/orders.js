@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { string } = require('yup');
+const { ORDER_STATUS } = require('../utilities/constants');
 
 const ordersSchema = new mongoose.Schema({
     orderId: {
@@ -41,7 +42,7 @@ const ordersSchema = new mongoose.Schema({
     },
     orderStatus: {
         type: String,
-        default: "Processing",
+        default: ORDER_STATUS.processing,
     },
     foodStatus: {
         type: String,

@@ -21,9 +21,19 @@ const CUISINE_TYPES = {
     japanese: 'Japanese',
 };
 
+const ORDER_STATUS = {
+    processing: 'Processing',
+    accepted: 'Accepted',
+    rejected: 'Rejected',
+    reachedPickupLocation: 'Reached Pick-up location',
+    onTheWay: 'On the way',
+    delivered: 'delivered',
+}
+
 module.exports={
     RESPONSE_MESSAGES,
     MONGO_URI,
     USER_TYPES,
     CUISINE_TYPES,
+    ORDER_STATUS,
 }
