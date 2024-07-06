@@ -3,6 +3,7 @@ const { Restaurant } = require("../models/restaurant");
 const { Customer } = require("../models/customer");
 const { DeliveryAgent } = require("../models/deliveryAgent");
 const { MenuItem } = require('../models/menuItem');
+const { Orders } =require('../models/orders');
 const { USER_TYPES } = require("../utilities/constants");
 const {RESPONSE_MESSAGES} = require("../utilities/constants");
 
@@ -319,5 +320,37 @@ exports.updateAccountDetails = async(req,res) => {
 
   } catch(err) {
     res.status(400).json(err.message);
+  }
+};
+
+// This api will return all the orders under customer, restaurant, delivery agent based on the user type
+exports.getAllOrders = async(req,res) => {
+  try {
+    let key;
+    switch(req.body.userType) {
+      case USER_TYPES.customer:
+        key = USER_TYPES.customer+'Id';
+        break;
+      case USER_TYPES.restaurant:
+        key = USER_TYPES.restaurant+'Id';
+        break;
+      case USER_TYPES.deliveryAgent:
+        key = USER_TYPES.deliveryAgent+'Id';
+        break;
+    }
+
+    const documents = await Orders.find({
+      [key]: req.body.userId,
+    })
+
+    if(documents.length === 0) {
+      res.status(404).json({"message": "Data not found"});
+      return;
+    }
+
+    res.status(200).json(documents.reverse());
+  } catch(err) {
+    console.log(err);
+    res.status(400).json({message: "Something went wrong"})
   }
 };

@@ -12,5 +12,6 @@ router.get('/file/:type/:id', attachGFS, commonControllers.getImageById);
 router.patch('/delete/:type/:id', commonControllers.delete);
 router.patch('/change-password', validateSchema(changePassword), commonControllers.changePassword);
 router.patch('/update-account-details', validateSchema(updateAccountDetailsSchema), commonControllers.updateAccountDetails);
+router.post('/all-orders', commonControllers.getAllOrders);
 
 module.exports = router;
