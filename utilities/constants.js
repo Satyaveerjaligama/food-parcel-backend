@@ -27,7 +27,7 @@ const ORDER_STATUS = {
     rejected: 'Rejected',
     reachedPickupLocation: 'Reached Pick-up location',
     onTheWay: 'On the way',
-    delivered: 'delivered',
+    delivered: 'Delivered',
 }
 
 module.exports={

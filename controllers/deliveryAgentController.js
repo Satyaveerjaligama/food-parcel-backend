@@ -1,5 +1,6 @@
 const { DeliveryAgent } = require("../models/deliveryAgent");
-const { RESPONSE_MESSAGES } = require("../utilities/constants");
+const { Orders } = require("../models/orders");
+const { RESPONSE_MESSAGES, ORDER_STATUS } = require("../utilities/constants");
 const {generateUserId} = require("../utilities/utilityFunctions");
 
 exports.register = async (req, res) => {
@@ -17,5 +18,67 @@ exports.register = async (req, res) => {
     res.status(201).send(`Delivery agent ${RESPONSE_MESSAGES.registrationSuccess}`);
   } catch (err) {
     res.status(404).send(err.message);
+  }
+};
+
+exports.getOrderInfo = async(req, res) => {
+  try{
+    const currentOrderDetails = await Orders.findOne({
+      deliveryAgentId : req.body.userId,
+      orderStatus: {$in: [ORDER_STATUS.processing, ORDER_STATUS.reachedPickupLocation, ORDER_STATUS.onTheWay]}
+    }, {
+      orderId: 1,
+      orderStatus: 1,
+      pickupLocation: 1,
+      deliveryLocation: 1,
+      _id: 0
+    });
+
+    if(currentOrderDetails) {
+      res.status(200).json({
+        currentOrderDetails,
+        activeOrders: []
+      });
+      return;
+    }
+
+    const activeOrders = await Orders.find({
+      pincode: req.body.pincode,
+      deliveryAgentId: undefined
+    }, {
+      orderId: 1,
+      pickupLocation: 1,
+      deliveryLocation: 1,
+      orderStatus: 1,
+      _id: 0
+    });
+
+    if(activeOrders.length === 0) {
+      res.status(400).json({message: "No Orders available"})
+      return;
+    }
+
+    res.status(200).json({
+      currentOrderDetails: null,
+      activeOrders
+    })
+  } catch(err) {
+    res.status(200).json({message: "Something went wrong"})
+  }
+};
+
+exports.getEarnings = async(req, res) => {
+  try{
+    const orders = await Orders.find({
+      deliveryAgentId: req.params.deliveryAgentId,
+      orderStatus: ORDER_STATUS.delivered
+    });
+
+    res.status(200).json({
+      totalOrders: orders.length,
+      totalEarnings: orders.length*23,
+    })
+  }catch(err){
+    res.status(400).json({message: "Something went wrong"})
   }
 };
