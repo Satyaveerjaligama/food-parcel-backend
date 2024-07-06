@@ -66,3 +66,19 @@ exports.getOrderInfo = async(req, res) => {
     res.status(200).json({message: "Something went wrong"})
   }
 };
+
+exports.getEarnings = async(req, res) => {
+  try{
+    const orders = await Orders.find({
+      deliveryAgentId: req.params.deliveryAgentId,
+      orderStatus: ORDER_STATUS.delivered
+    });
+
+    res.status(200).json({
+      totalOrders: orders.length,
+      totalEarnings: orders.length*23,
+    })
+  }catch(err){
+    res.status(400).json({message: "Something went wrong"})
+  }
+};
