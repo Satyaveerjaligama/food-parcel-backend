@@ -6,20 +6,15 @@ const { MenuItem } = require('../models/menuItem');
 const { Orders } =require('../models/orders');
 const { USER_TYPES } = require("../utilities/constants");
 const {RESPONSE_MESSAGES} = require("../utilities/constants");
+const { getModelAndKey } = require("../utilities/utilityFunctions");
 
 exports.login = async (req, res) => {
-  let Model;
-  // model will be set based on the userType
-  switch (req.body.userType) {
-    case USER_TYPES.customer:
-      Model = Customer;
-      break;
-    case USER_TYPES.restaurant:
-      Model = Restaurant;
-      break;
-    case USER_TYPES.deliveryAgent:
-      Model = DeliveryAgent;
-      break;
+
+  const {Model} = getModelAndKey(req.body.userType);
+
+  if(!Model) {
+    res.status(400).json('Model not found');
+    return;
   }
 
   Model.find({
@@ -66,34 +61,20 @@ exports.login = async (req, res) => {
       }
     })
     .catch((err) => {
-      res.status(400).json({ message: err.message });
+      res.status(500).json({ message: err.message });
     });
 };
 
 exports.fileUpload = async (req, res) => {
   try {
-    let model;
-    let key;
-    switch (req.body.type) {
-      case USER_TYPES.customer:
-        model = Customer;
-        key = USER_TYPES.customer+'Id';
-        break;
-      case USER_TYPES.restaurant:
-        model = Restaurant;
-        key = USER_TYPES.restaurant+'Id';
-        break;
-      case USER_TYPES.deliveryAgent:
-        model = DeliveryAgent;
-        key = USER_TYPES.deliveryAgent+'Id';
-        break;
-      case 'menuItem':
-        model = MenuItem;
-        key = "itemId";
-        break;
+    const {Model, key} = getModelAndKey(req.body.type);
+
+    if(!Model) {
+      res.status(400).json('Model not found');
+      return;
     }
 
-    const document = await model.findOne({
+    const document = await Model.findOne({
       [key]: req.params.id,
     });
 
@@ -131,24 +112,14 @@ exports.fileUpload = async (req, res) => {
 
 exports.getImageById = async (req, res) => {
   try {
-    let model;
-    let key;
-    switch(req.params.type) {
-      case USER_TYPES.customer:
-        model = Customer;
-        key = USER_TYPES.customer+'Id';
-        break;
-      case USER_TYPES.restaurant:
-        model = Restaurant;
-        key = USER_TYPES.restaurant+'Id';
-        break;
-      case USER_TYPES.deliveryAgent:
-        model = DeliveryAgent;
-        key = USER_TYPES.deliveryAgent+'Id';
-        break;
+    const {Model, key} = getModelAndKey(req.params.type);
+
+    if(!Model) {
+      res.status(400).json('Model not found');
+      return;
     }
 
-    const document = await model.findOne({
+    const document = await Model.findOne({
       [key]: req.params.id
     });
 
@@ -176,26 +147,11 @@ exports.getImageById = async (req, res) => {
 // this api will set the isActive value to false
 exports.delete = async(req, res) => {
   try{
-    let Model;
-    let key;
-    // setting the model
-    switch (req.params.type) {
-      case USER_TYPES.customer:
-        Model = Customer;
-        key = USER_TYPES.customer+'Id';
-        break;
-      case USER_TYPES.restaurant:
-        Model = Restaurant;
-        key = USER_TYPES.restaurant+'Id';
-        break;
-      case USER_TYPES.deliveryAgent:
-        Model = DeliveryAgent;
-        key = USER_TYPES.deliveryAgent+'Id';
-        break;
-      case 'menuItem':
-        Model = MenuItem;
-        key = "itemId";
-        break;
+    const {Model, key} = getModelAndKey(req.params.type);
+
+    if(!Model) {
+      res.status(400).json('Model not found');
+      return;
     }
 
     const document = await Model.updateOne(
@@ -219,30 +175,18 @@ exports.delete = async(req, res) => {
 
     res.status(200).json({message: 'Deleted successfully'});
   } catch(err) {
-    console.log(err);
-    res.status(400).json({message: "Something went wrong"});
+    res.status(500).json({message: "Something went wrong"});
   }
 };
 
 // This api can you used to change the password of a user
 exports.changePassword = async(req,res) => {
   try {
-    let Model;
-    let key;
-    // setting the Model and key
-    switch (req.body.type) {
-      case USER_TYPES.customer:
-        Model = Customer;
-        key = USER_TYPES.customer+'Id';
-        break;
-      case USER_TYPES.restaurant:
-        Model = Restaurant;
-        key = USER_TYPES.restaurant+'Id';
-        break;
-      case USER_TYPES.deliveryAgent:
-        Model = DeliveryAgent;
-        key = USER_TYPES.deliveryAgent+'Id';
-        break;
+    const {Model, key} = getModelAndKey(req.body.type);
+
+    if(!Model) {
+      res.status(400).json('Model not found');
+      return;
     }
     
     // updating the document based on req body
@@ -265,7 +209,7 @@ exports.changePassword = async(req,res) => {
 
     res.status(200).json({message: 'Updated successfully'});
   } catch(err) {
-    res.status(400).json(err.message);
+    res.status(500).json(err.message);
   }
 };
 
@@ -319,24 +263,18 @@ exports.updateAccountDetails = async(req,res) => {
     res.status(200).json({message: 'Updated successfully'});
 
   } catch(err) {
-    res.status(400).json(err.message);
+    res.status(500).json(err.message);
   }
 };
 
 // This api will return all the orders under customer, restaurant, delivery agent based on the user type
 exports.getAllOrders = async(req,res) => {
   try {
-    let key;
-    switch(req.body.userType) {
-      case USER_TYPES.customer:
-        key = USER_TYPES.customer+'Id';
-        break;
-      case USER_TYPES.restaurant:
-        key = USER_TYPES.restaurant+'Id';
-        break;
-      case USER_TYPES.deliveryAgent:
-        key = USER_TYPES.deliveryAgent+'Id';
-        break;
+    const {key} = getModelAndKey(req.body.userType);
+
+    if(!key) {
+      res.status(400).json('Key not found');
+      return;
     }
 
     const documents = await Orders.find({
@@ -350,7 +288,6 @@ exports.getAllOrders = async(req,res) => {
 
     res.status(200).json(documents.reverse());
   } catch(err) {
-    console.log(err);
-    res.status(400).json({message: "Something went wrong"})
+    res.status(500).json({message: "Something went wrong"})
   }
 };

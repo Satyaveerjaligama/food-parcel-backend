@@ -17,7 +17,7 @@ exports.register = async (req, res) => {
     await newDeliveryAgent.save();
     res.status(201).send(`Delivery agent ${RESPONSE_MESSAGES.registrationSuccess}`);
   } catch (err) {
-    res.status(404).send(err.message);
+    res.status(500).send(err.message);
   }
 };
 
@@ -63,7 +63,7 @@ exports.getOrderInfo = async(req, res) => {
       activeOrders
     })
   } catch(err) {
-    res.status(200).json({message: "Something went wrong"})
+    res.status(500).json({message: "Something went wrong"})
   }
 };
 
@@ -79,6 +79,6 @@ exports.getEarnings = async(req, res) => {
       totalEarnings: orders.length*23,
     })
   }catch(err){
-    res.status(400).json({message: "Something went wrong"})
+    res.status(500).json({message: "Something went wrong"})
   }
 };

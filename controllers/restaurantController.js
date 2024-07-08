@@ -19,7 +19,7 @@ exports.register = async (req, res) => {
     await newRestaurant.save();
     res.status(201).send(`Restaurant ${RESPONSE_MESSAGES.registrationSuccess}`);
   } catch (err) {
-    res.status(404).send(err.message);
+    res.status(500).send(err.message);
   }
 };
 
@@ -62,7 +62,7 @@ exports.fetchRestaurants = async (req, res) => {
     
     res.status(200).json(response);
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -73,7 +73,7 @@ exports.fetchRestaurantDetails = async(req, res) => {
         const restaurants = await Restaurant.find({restaurantId},{restaurantId: 1, restaurantName: 1, restaurantType: 1, _id: 0});
         res.status(200).json(restaurants[0]);
     } catch(err) {
-        res.status(400).json({message: err.message})
+        res.status(500).json({message: err.message})
     }
 }
 
@@ -114,7 +114,7 @@ exports.addMenuItem = async(req,res) => {
       allMenuItems
     });
   } catch(err) {
-    res.status(400).send(err.message);
+    res.status(500).send(err.message);
   }
 };
 
@@ -160,7 +160,7 @@ exports.getMenuItems = async(req, res) => {
     
     res.status(200).json(response);
   } catch(err) {
-    res.status(400).json({message: "Something went wrong"})
+    res.status(500).json({message: "Something went wrong"})
   }
 };
 
@@ -196,7 +196,7 @@ exports.updateMenuItem = async(req,res) => {
       res.status(404).json({message: 'Menu item not found'})
     }
   } catch(err) {
-    res.status(400).json({message: "Something went wrong"})
+    res.status(500).json({message: "Something went wrong"})
   }
 };
 
@@ -219,7 +219,7 @@ exports.deleteMenuItem = async(req,res) => {
       res.status(404).json({message: "Menu Item not found"});
     }
   } catch(err) {
-    res.status(400).json({message: "Something went wrong"});
+    res.status(500).json({message: "Something went wrong"});
   }
 };
 
@@ -239,6 +239,6 @@ exports.fetchActiveOrders = async(req,res) => {
 
     res.status(200).json(activeOrders);
   } catch(err) {
-    res.status(400).json({message: "something went wrong"});
+    res.status(500).json({message: "something went wrong"});
   }
 };
