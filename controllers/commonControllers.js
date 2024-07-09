@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 const { Restaurant } = require("../models/restaurant");
 const { Customer } = require("../models/customer");
 const { DeliveryAgent } = require("../models/deliveryAgent");
-const { MenuItem } = require('../models/menuItem');
 const { Orders } =require('../models/orders');
 const { USER_TYPES } = require("../utilities/constants");
 const {RESPONSE_MESSAGES} = require("../utilities/constants");
@@ -13,18 +12,18 @@ exports.login = async (req, res) => {
   const {Model} = getModelAndKey(req.body.userType);
 
   if(!Model) {
-    res.status(400).json('Model not found');
+    res.status(400).json({message: 'Model not found'});
     return;
   }
 
-  Model.find({
+  Model.findOne({
     emailId: req.body.emailId,
     password: req.body.password,
   })
-    .then((documents) => {
-      if (documents.length === 0) {
-        res.status(404).json({ message: RESPONSE_MESSAGES.detailsNotFound });
-      } else if (!documents[0].isActive) {
+    .then((document) => {
+      if (!document) {
+        res.status(404).json({ message: RESPONSE_MESSAGES.enterValidCredentials });
+      } else if (document && !(document?.isActive)) {
         res.status(403).json({ message: RESPONSE_MESSAGES.userIsInactive });
       } else {
         let responseObj;
@@ -32,31 +31,31 @@ exports.login = async (req, res) => {
         switch (req.body.userType) {
           case USER_TYPES.customer:
             responseObj = {
-              name: documents[0].fullName,
-              userId: documents[0].customerId,
-              pincode: documents[0].pincode,
+              name: document.fullName,
+              userId: document.customerId,
+              pincode: document.pincode,
             };
             break;
           case USER_TYPES.restaurant:
             responseObj = {
-              name: documents[0].restaurantName,
-              userId: documents[0].restaurantId,
-              pincode: documents[0].pincode,
+              name: document.restaurantName,
+              userId: document.restaurantId,
+              pincode: document.pincode,
             };
             break;
           case USER_TYPES.deliveryAgent:
             responseObj = {
-              name: documents[0].fullName,
-              userId: documents[0].deliveryAgentId,
-              pincode: documents[0].availabilityPincode,
+              name: document.fullName,
+              userId: document.deliveryAgentId,
+              pincode: document.availabilityPincode,
             };
             break;
         }
         res.status(200).json({
           ...responseObj,
-          phoneNumber: documents[0].phoneNumber,
-          emailId: documents[0].emailId,
-          address: documents[0].address,
+          phoneNumber: document.phoneNumber,
+          emailId: document.emailId,
+          address: document.address,
         });
       }
     })
@@ -70,7 +69,7 @@ exports.fileUpload = async (req, res) => {
     const {Model, key} = getModelAndKey(req.body.type);
 
     if(!Model) {
-      res.status(400).json('Model not found');
+      res.status(400).json({messahe: 'Model not found'});
       return;
     }
 
@@ -79,12 +78,12 @@ exports.fileUpload = async (req, res) => {
     });
 
     if (!document) {
-      return res.status(404).json({ msg: "Details not found" });
+      return res.status(404).json({ message: "Details not found" });
     }
 
     const gfs = req.gfs;
     if (!gfs) {
-      return res.status(500).json({ error: "gfs is not defined" });
+      return res.status(500).json({ message: "gfs is not defined" });
     }
 
     // If there is already an image, delete the old image file from GridFS
@@ -95,7 +94,7 @@ exports.fileUpload = async (req, res) => {
           if (err) {
             return res
               .status(500)
-              .json({ msg: "Error occurred while deleting old image" });
+              .json({ message: "Error occurred while deleting old image" });
           }
         }
       );
@@ -106,7 +105,7 @@ exports.fileUpload = async (req, res) => {
 
     res.json({ file: req.file, document });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -115,7 +114,7 @@ exports.getImageById = async (req, res) => {
     const {Model, key} = getModelAndKey(req.params.type);
 
     if(!Model) {
-      res.status(400).json('Model not found');
+      res.status(400).json({message: 'Model not found'});
       return;
     }
 
@@ -124,23 +123,22 @@ exports.getImageById = async (req, res) => {
     });
 
     if (!document) {
-      return res.status(404).json({ error: 'Document not found' });
+      return res.status(404).json({ message: 'Document not found' });
     }
 
     const gfs = req.gfs;
     if (!gfs) {
-      return res.status(500).json({ error: 'gfs is not defined' });
+      return res.status(500).json({ message: 'gfs is not defined' });
     }
 
     if (!document.image) {
-      return res.status(404).json({ error: 'Image not found' });
+      return res.status(404).json({ message: 'Image not found' });
     }
 
     gfs.openDownloadStream(new mongoose.Types.ObjectId(document.image))
       .pipe(res);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ error: 'Server Error' });
+    res.status(500).json({ message: 'Server Error' });
   }
 };
 
@@ -150,7 +148,7 @@ exports.delete = async(req, res) => {
     const {Model, key} = getModelAndKey(req.params.type);
 
     if(!Model) {
-      res.status(400).json('Model not found');
+      res.status(400).json({message: 'Model not found'});
       return;
     }
 
@@ -209,7 +207,7 @@ exports.changePassword = async(req,res) => {
 
     res.status(200).json({message: 'Updated successfully'});
   } catch(err) {
-    res.status(500).json(err.message);
+    res.status(500).json({message: err.message});
   }
 };
 
@@ -263,7 +261,7 @@ exports.updateAccountDetails = async(req,res) => {
     res.status(200).json({message: 'Updated successfully'});
 
   } catch(err) {
-    res.status(500).json(err.message);
+    res.status(500).json({message: err.message});
   }
 };
 
@@ -273,7 +271,7 @@ exports.getAllOrders = async(req,res) => {
     const {key} = getModelAndKey(req.body.userType);
 
     if(!key) {
-      res.status(400).json('Key not found');
+      res.status(400).json({message: 'Key not found'});
       return;
     }
 
@@ -282,7 +280,7 @@ exports.getAllOrders = async(req,res) => {
     })
 
     if(documents.length === 0) {
-      res.status(404).json({"message": "Data not found"});
+      res.status(404).json({message: 'Data not found'});
       return;
     }
 

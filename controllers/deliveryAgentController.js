@@ -17,7 +17,7 @@ exports.register = async (req, res) => {
     await newDeliveryAgent.save();
     res.status(201).send(`Delivery agent ${RESPONSE_MESSAGES.registrationSuccess}`);
   } catch (err) {
-    res.status(500).send(err.message);
+    res.status(500).json({message: err.message});
   }
 };
 
@@ -44,7 +44,8 @@ exports.getOrderInfo = async(req, res) => {
 
     const activeOrders = await Orders.find({
       pincode: req.body.pincode,
-      deliveryAgentId: undefined
+      deliveryAgentId: undefined,
+      orderStatus: {$nin: [ORDER_STATUS.rejected, ORDER_STATUS.processing]}
     }, {
       orderId: 1,
       pickupLocation: 1,

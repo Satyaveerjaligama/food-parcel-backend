@@ -19,7 +19,7 @@ exports.register = async (req, res) => {
     await newRestaurant.save();
     res.status(201).send(`Restaurant ${RESPONSE_MESSAGES.registrationSuccess}`);
   } catch (err) {
-    res.status(500).send(err.message);
+    res.status(500).json({message: err.message});
   }
 };
 
@@ -40,6 +40,8 @@ exports.fetchRestaurants = async (req, res) => {
       }
     );
 
+    const response = [];
+
     const promises = restaurants.map(async (restaurant) => {
       let base64Image;
       // if a restaurant has an image, then we try to get and convert to base 64 using downloadImage function
@@ -57,7 +59,6 @@ exports.fetchRestaurants = async (req, res) => {
       });
     });
 
-    const response = [];
     await Promise.all(promises);
     
     res.status(200).json(response);
@@ -70,8 +71,8 @@ exports.fetchRestaurants = async (req, res) => {
 exports.fetchRestaurantDetails = async(req, res) => {
     const restaurantId = req.params?.restaurantId;
     try {
-        const restaurants = await Restaurant.find({restaurantId},{restaurantId: 1, restaurantName: 1, restaurantType: 1, _id: 0});
-        res.status(200).json(restaurants[0]);
+        const restaurant = await Restaurant.findOne({restaurantId},{restaurantId: 1, restaurantName: 1, restaurantType: 1, _id: 0});
+        res.status(200).json(restaurant);
     } catch(err) {
         res.status(500).json({message: err.message})
     }
@@ -109,12 +110,31 @@ exports.addMenuItem = async(req,res) => {
     // fetching updated menu items list
     const allMenuItems = await MenuItem.find({restaurantId}, {_id: 0, __v: 0});
 
+    const response = [];
+
+    const promises = allMenuItems.map(async (menuItem) => {
+      let base64Image;
+      // if a menuItem has an image, then we try to get and convert to base 64 using downloadImage function
+      if (menuItem.image) {
+        const imageId = new Types.ObjectId(menuItem.image);
+        const gfs = req.gfs;
+        base64Image = await downloadImage(gfs, imageId);
+      }
+
+      response.push({
+        ...menuItem._doc,
+        image: base64Image ? base64Image : "",
+      });
+    });
+
+    await Promise.all(promises);
+    
     res.status(201).json({
       addedItem,
-      allMenuItems
+      allMenuItems: response,
     });
   } catch(err) {
-    res.status(500).send(err.message);
+    res.status(500).json({message: err.message});
   }
 };
 
@@ -191,7 +211,25 @@ exports.updateMenuItem = async(req,res) => {
     if(updatedMenuItem.matchedCount > 0) {
       const menuItems = await MenuItem.find({restaurantId}, {_id: 0, __v: 0})
 
-      res.status(200).json(menuItems)
+      const response = [];
+
+      const promises = menuItems.map(async (menuItem) => {
+        let base64Image;
+        // if a menuItem has an image, then we try to get and convert to base 64 using downloadImage function
+        if (menuItem.image) {
+          const imageId = new Types.ObjectId(menuItem.image);
+          const gfs = req.gfs;
+          base64Image = await downloadImage(gfs, imageId);
+        }
+
+        response.push({
+          ...menuItem._doc,
+          image: base64Image ? base64Image : "",
+        });
+      });
+
+      await Promise.all(promises);
+      res.status(200).json(response);
     } else {
       res.status(404).json({message: 'Menu item not found'})
     }
@@ -214,7 +252,26 @@ exports.deleteMenuItem = async(req,res) => {
     if(result.deletedCount > 0) {
       // Fetching update menu items list
       const allMenuItems = await MenuItem.find({restaurantId}, {_id: 0, __v: 0});
-      res.status(200).json(allMenuItems);
+
+      const response = [];
+
+      const promises = allMenuItems.map(async (menuItem) => {
+        let base64Image;
+        // if a menuItem has an image, then we try to get and convert to base 64 using downloadImage function
+        if (menuItem.image) {
+          const imageId = new Types.ObjectId(menuItem.image);
+          const gfs = req.gfs;
+          base64Image = await downloadImage(gfs, imageId);
+        }
+
+        response.push({
+          ...menuItem._doc,
+          image: base64Image ? base64Image : "",
+        });
+      });
+
+      await Promise.all(promises);
+      res.status(200).json(response);
     } else {
       res.status(404).json({message: "Menu Item not found"});
     }
@@ -239,6 +296,6 @@ exports.fetchActiveOrders = async(req,res) => {
 
     res.status(200).json(activeOrders);
   } catch(err) {
-    res.status(500).json({message: "something went wrong"});
+    res.status(500).json({message: "Something went wrong"});
   }
 };
