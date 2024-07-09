@@ -1,3 +1,9 @@
+const {Customer} = require('../models/customer');
+const {Restaurant} = require('../models/restaurant');
+const {DeliveryAgent} = require('../models/deliveryAgent');
+const {MenuItem} = require('../models/menuItem'); 
+const { USER_TYPES } = require('./constants');
+
 function generateUserId(type) {
   return type + "_" + Math.floor(100000 + Math.random() * 900000).toString();
 }
@@ -39,8 +45,35 @@ const getCurrentDateAndTime = ()  => {
   return {date, time};
 };
 
+// This function will take the type and return the Model and key
+const getModelAndKey = (type) => {
+  let Model;
+  let key;
+  switch (type) {
+    case USER_TYPES.customer:
+      Model = Customer;
+      key = USER_TYPES.customer+'Id';
+      break;
+    case USER_TYPES.restaurant:
+      Model = Restaurant;
+      key = USER_TYPES.restaurant+'Id';
+      break;
+    case USER_TYPES.deliveryAgent:
+      Model = DeliveryAgent;
+      key = USER_TYPES.deliveryAgent+'Id';
+      break;
+    case 'menuItem':
+      Model = MenuItem;
+      key = "itemId";
+      break;
+  }
+
+  return {Model, key}
+};
+
 module.exports = {
   generateUserId,
   downloadImage,
   getCurrentDateAndTime,
+  getModelAndKey,
 };

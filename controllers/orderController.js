@@ -32,7 +32,7 @@ exports.create = async(req, res) => {
             orderStatus: order.orderStatus
         });
     } catch(err) {
-        res.status(400).json({message: "Something went wrong"})
+        res.status(500).json({message: "Something went wrong"})
     }
 };
 
@@ -59,7 +59,6 @@ exports.updateOrderInfo = async(req, res) => {
         
         res.status(200).json({message: 'Order info updated successfully'})
     } catch(err) {
-        console.log(err);
-        res.status(400).json({message: 'Something went wrong'})
+        res.status(500).json({message: 'Something went wrong'})
     }
 };
