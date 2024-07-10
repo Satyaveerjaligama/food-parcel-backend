@@ -16,6 +16,6 @@ exports.register = async (req, res) => {
         await newCustomer.save();
         res.status(201).send(`Customer ${RESPONSE_MESSAGES.registrationSuccess}`)
     } catch(err) {
-        res.status(500).send(err.message)
+        res.status(500).json({message: err.message});
     }
 }
