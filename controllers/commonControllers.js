@@ -69,7 +69,7 @@ exports.fileUpload = async (req, res) => {
     const {Model, key} = getModelAndKey(req.body.type);
 
     if(!Model) {
-      res.status(400).json({messahe: 'Model not found'});
+      res.status(400).json({message: 'Model not found'});
       return;
     }
 
